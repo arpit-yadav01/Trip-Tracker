@@ -1,6 +1,7 @@
 from bson import ObjectId
 from app.db.mongo import trips_collection
 from app.models.trip import trip_model
+from bson import ObjectId
 
 
 async def create_trip_service(data: dict):
@@ -33,3 +34,27 @@ async def activate_trip_service(trip_id: str):
         {"_id": ObjectId(trip_id)},
         {"$set": {"status": "ACTIVE"}}
     )
+
+
+
+
+
+async def activate_trip_service(trip_id: str, leader_id: str):
+    trip = await trips_collection.find_one({"_id": ObjectId(trip_id)})
+
+    if not trip:
+        return None
+
+    # Only leader can activate
+    if trip["leader_id"] != leader_id:
+        return "not_leader"
+
+    if trip["status"] != "CREATED":
+        return "invalid_state"
+
+    await trips_collection.update_one(
+        {"_id": ObjectId(trip_id)},
+        {"$set": {"status": "ACTIVE"}}
+    )
+
+    return "activated"

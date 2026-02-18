@@ -9,6 +9,10 @@ from app.services.trip_service import (
     join_trip_service
 )
 
+from app.schemas.trip import ActivateTripRequest
+from app.services.trip_service import activate_trip_service
+from fastapi import HTTPException
+
 router = APIRouter()
 
 
@@ -26,3 +30,22 @@ async def join_trip(payload: JoinTripRequest):
         raise HTTPException(status_code=404, detail="Trip not found")
 
     return {"message": "Joined trip successfully"}
+
+
+@router.post("/activate")
+async def activate_trip(payload: ActivateTripRequest):
+    result = await activate_trip_service(
+        payload.trip_id,
+        payload.leader_id
+    )
+
+    if result is None:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    if result == "not_leader":
+        raise HTTPException(status_code=403, detail="Only leader can activate")
+
+    if result == "invalid_state":
+        raise HTTPException(status_code=400, detail="Trip already active")
+
+    return {"message": "Trip activated"}

@@ -19,3 +19,9 @@ class TripResponse(BaseModel):
 class JoinTripRequest(BaseModel):
     trip_id: str
     user_id: str
+
+
+
+class ActivateTripRequest(BaseModel):
+    trip_id: str
+    leader_id: str
