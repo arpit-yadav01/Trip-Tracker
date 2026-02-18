@@ -6,3 +6,4 @@ db = client[settings.DB_NAME]
 
 users_collection = db["users"]
 trips_collection = db["trips"]
+sos_collection = db["sos_events"]
