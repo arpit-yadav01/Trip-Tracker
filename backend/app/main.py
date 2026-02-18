@@ -5,7 +5,7 @@ from app.websocket.manager import manager
 from app.core.security import verify_token
 from app.db.mongo import trips_collection
 from app.api import auth, trips
-
+from app.services.tracking_service import update_location_service
 
 app = FastAPI()
 
@@ -49,9 +49,46 @@ async def websocket_endpoint(websocket: WebSocket, trip_id: str, token: str):
     try:
         while True:
             data = await websocket.receive_json()
-            data["user_id"] = user_id
-            await manager.broadcast(trip_id, data)
+            event_type = data.get("type")
 
+            # =========================
+            # 📍 LOCATION UPDATE EVENT
+            # =========================
+            if event_type == "location_update":
+
+                lat = data.get("lat")
+                lng = data.get("lng")
+                timestamp = data.get("timestamp")
+
+                if lat is None or lng is None:
+                    continue
+
+                # Store in DB
+                await update_location_service(
+                    trip_id=trip_id,
+                    user_id=user_id,
+                    lat=lat,
+                    lng=lng,
+                    timestamp=timestamp
+                )
+
+                # Broadcast structured event
+                await manager.broadcast(trip_id, {
+                    "type": "member_location",
+                    "user_id": user_id,
+                    "lat": lat,
+                    "lng": lng,
+                    "timestamp": timestamp
+                })
+
+            # =========================
+            # 💓 HEARTBEAT EVENT
+            # =========================
+            elif event_type == "heartbeat":
+                await manager.broadcast(trip_id, {
+                    "type": "member_online",
+                    "user_id": user_id
+                })
 
     except WebSocketDisconnect:
         manager.disconnect(trip_id, websocket)
