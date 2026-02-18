@@ -52,5 +52,6 @@ async def websocket_endpoint(websocket: WebSocket, trip_id: str, token: str):
             data["user_id"] = user_id
             await manager.broadcast(trip_id, data)
 
+
     except WebSocketDisconnect:
         manager.disconnect(trip_id, websocket)
