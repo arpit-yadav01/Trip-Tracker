@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@react-native-community/netinfo": "^12.0.1"
+  },
+  "devDependencies": {
+    "@react-native-community/cli": "^20.1.1"
+  }
+}
