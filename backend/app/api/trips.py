@@ -13,6 +13,9 @@ from app.schemas.trip import ActivateTripRequest
 from app.services.trip_service import activate_trip_service
 from fastapi import HTTPException
 
+from app.schemas.trip import CompleteTripRequest
+from app.services.trip_service import complete_trip_service
+
 router = APIRouter()
 
 
@@ -49,3 +52,25 @@ async def activate_trip(payload: ActivateTripRequest):
         raise HTTPException(status_code=400, detail="Trip already active")
 
     return {"message": "Trip activated"}
+
+
+
+
+@router.post("/complete")
+async def complete_trip(payload: CompleteTripRequest):
+
+    result = await complete_trip_service(
+        payload.trip_id,
+        payload.leader_id
+    )
+
+    if result is None:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    if result == "not_leader":
+        raise HTTPException(status_code=403, detail="Only leader can complete")
+
+    if result == "invalid_state":
+        raise HTTPException(status_code=400, detail="Trip not active")
+
+    return {"message": "Trip completed"}
