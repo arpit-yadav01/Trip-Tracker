@@ -42,7 +42,9 @@ async def set_password(payload: SetPasswordRequest):
 async def login(payload: LoginRequest):
     result = await login_service(payload.phone, payload.password)
 
+    
     if not result:
         raise HTTPException(status_code=400, detail="Invalid credentials")
+
 
     return result

@@ -4,10 +4,12 @@ from app.schemas.trip import (
     TripResponse,
     JoinTripRequest
 )
+
 from app.services.trip_service import (
     create_trip_service,
     join_trip_service
 )
+
 
 from app.schemas.trip import ActivateTripRequest
 from app.services.trip_service import activate_trip_service
