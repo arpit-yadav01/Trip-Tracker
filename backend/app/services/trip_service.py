@@ -3,6 +3,7 @@ from app.db.mongo import trips_collection
 from app.models.trip import trip_model
 from bson import ObjectId
 
+from app.db.mongo import trips_collection
 
 async def create_trip_service(data: dict):
     trip_data = trip_model(data)
@@ -58,3 +59,26 @@ async def activate_trip_service(trip_id: str, leader_id: str):
     )
 
     return "activated"
+
+
+
+
+async def complete_trip_service(trip_id: str, leader_id: str):
+
+    trip = await trips_collection.find_one({"_id": ObjectId(trip_id)})
+
+    if not trip:
+        return None
+
+    if trip["leader_id"] != leader_id:
+        return "not_leader"
+
+    if trip["status"] != "ACTIVE":
+        return "invalid_state"
+
+    await trips_collection.update_one(
+        {"_id": ObjectId(trip_id)},
+        {"$set": {"status": "COMPLETED"}}
+    )
+
+    return "completed"

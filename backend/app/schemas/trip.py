@@ -25,3 +25,7 @@ class JoinTripRequest(BaseModel):
 class ActivateTripRequest(BaseModel):
     trip_id: str
     leader_id: str
+
+class CompleteTripRequest(BaseModel):
+    trip_id: str
+    leader_id: str
