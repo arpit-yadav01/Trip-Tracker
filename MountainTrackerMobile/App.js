@@ -7,13 +7,23 @@ import {
 
 import { initDB } from "./src/storage/localDB";
 import { startSyncEngine } from "./src/services/syncService";
+import { startOfflineMonitor } from "./src/services/offlineMonitor";
 
 function App() {
   const isDarkMode = useColorScheme() === "dark";
 
   useEffect(() => {
+    // Initialize Local SQLite DB
     initDB();
-    startSyncEngine("http://YOUR_BACKEND_IP:8000");
+
+    // Start background sync engine
+    startSyncEngine("http://192.168.1.6:8000");
+
+    // Start offline monitor (5 minutes threshold)
+    startOfflineMonitor(
+      5,                // threshold minutes
+      "+911234567890"   // replace with real emergency number
+    );
   }, []);
 
   return (
@@ -27,11 +37,7 @@ function App() {
 function AppContent() {
   const safeAreaInsets = useSafeAreaInsets();
 
-  return (
-    <View style={styles.container}>
-      {/* Your real app UI will go here */}
-    </View>
-  );
+  return <View style={styles.container} />;
 }
 
 const styles = StyleSheet.create({

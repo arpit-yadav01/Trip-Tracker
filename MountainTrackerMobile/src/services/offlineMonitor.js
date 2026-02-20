@@ -1,13 +1,13 @@
 import NetInfo from "@react-native-community/netinfo";
 import { sendEmergencySMS } from "../native/sms";
+import { getLastLocation } from "../storage/localDB";
 
 let offlineStart = null;
 let smsSent = false;
 
 export function startOfflineMonitor(
   thresholdMinutes,
-  emergencyPhone,
-  getLastLocation
+  emergencyPhone
 ) {
   setInterval(async () => {
     const state = await NetInfo.fetch();
@@ -21,7 +21,13 @@ export function startOfflineMonitor(
         (Date.now() - offlineStart) / 60000;
 
       if (offlineMinutes > thresholdMinutes && !smsSent) {
-        const location = getLastLocation();
+
+        const location = await getLastLocation();
+
+        if (!location) {
+          console.log("No local GPS found for SMS");
+          return;
+        }
 
         const message = `
 🚨 SAFETY ALERT
