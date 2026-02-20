@@ -25,7 +25,7 @@ export function startOfflineMonitor(
         const location = await getLastLocation();
 
         if (!location) {
-          console.log("No local GPS found for SMS");
+          console.log("No GPS stored locally yet.");
           return;
         }
 
