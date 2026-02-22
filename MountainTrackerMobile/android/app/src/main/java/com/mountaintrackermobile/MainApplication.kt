@@ -1,48 +1,37 @@
-package com.mountaintracker;
+package com.mountaintrackermobile
 
-import android.app.Application;
-import com.facebook.react.ReactApplication;
-import com.facebook.react.ReactNativeHost;
-import com.facebook.react.ReactPackage;
-import com.facebook.react.PackageList;
-import com.facebook.soloader.SoLoader;
+import android.app.Application
+import com.facebook.react.PackageList
+import com.facebook.react.ReactApplication
+import com.facebook.react.ReactHost
+import com.facebook.react.ReactNativeHost
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
+import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
+import com.facebook.soloader.SoLoader
 
-import java.util.List;
-import java.util.ArrayList;
+class MainApplication : Application(), ReactApplication {
 
-public class MainApplication extends Application implements ReactApplication {
+  override val reactNativeHost: ReactNativeHost =
+    object : ReactNativeHost(this) {
+      override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
-  private final ReactNativeHost mReactNativeHost =
-      new ReactNativeHost(this) {
-        @Override
-        public boolean getUseDeveloperSupport() {
-          return BuildConfig.DEBUG;
-        }
+      override fun getPackages() =
+        PackageList(this).packages
 
-        @Override
-        protected List<ReactPackage> getPackages() {
-          List<ReactPackage> packages = new PackageList(this).getPackages();
+      override fun getJSMainModuleName(): String = "index"
 
-          // 👇 ADD YOUR CUSTOM PACKAGE HERE
-          packages.add(new SmsPackage());
+      override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
+      override val isHermesEnabled: Boolean = BuildConfig.IS_HERMES_ENABLED
+    }
 
-          return packages;
-        }
+  override val reactHost: ReactHost
+    get() = getDefaultReactHost(applicationContext, reactNativeHost)
 
-        @Override
-        protected String getJSMainModuleName() {
-          return "index";
-        }
-      };
-
-  @Override
-  public ReactNativeHost getReactNativeHost() {
-    return mReactNativeHost;
-  }
-
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    SoLoader.init(this, false);
+  override fun onCreate() {
+    super.onCreate()
+    SoLoader.init(this, false)
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      load()
+    }
   }
 }
